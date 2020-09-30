@@ -1,0 +1,92 @@
+<script type="text/javascript" >
+
+// Retrieve data from cloud url
+    function getXMLFromURL(e){
+        if(document.getElementById("source-url").value){
+            fetch(document.getElementById("source-url").value)
+            .then(response => response.text())
+            .then(data => { 
+                let xml_data = (document.getElementById("source-xml").value = data)
+                parseXML(xml_data);
+            })
+        }else{
+            alert("No file!")
+        }
+    }
+
+    // Retrieve data from local file
+    function getSourceFile(e){
+        if(document.getElementById("source-file").value){
+            let file = e.target.files[0];
+            let reader = new FileReader();
+            reader.onload = function(e) {
+                let contents = e.target.result;
+                parseXML(contents)
+            };
+            reader.readAsText(file);
+        
+        }
+    }
+  
+    // Parse data to remove items that are not blog items
+    function parseXML(xmlData){
+        let xml_data = xmlData
+        let nonBlog = {};
+        let parser = new DOMParser();
+            let parsed_data = parser.parseFromString(xml_data, "text/xml");
+            let items = parsed_data.getElementsByTagName("item");
+        let items_length = items.length;
+        let deleted_count = 0;
+        for (let i = 0; i < items_length; i++){
+            let item_url = items[i-deleted_count].getElementsByTagName("link")[0].childNodes[0].nodeValue
+            if (!item_url.includes("/blog/")){
+                let current_item = parsed_data.getElementsByTagName("item")[i-deleted_count];
+                deleted_count++;
+                current_item.parentNode.removeChild(current_item);
+            }else{
+            }
+        }
+
+        let final_xml_data = new XMLSerializer().serializeToString(parsed_data)
+
+        sendData(final_xml_data);
+    }
+
+    // Send the data to the serve to create a file 
+    function sendData(FD) {
+        let xhr = new XMLHttpRequest();
+
+        xhr.open("POST", "http://localhost:8080", true);
+
+        // declaring that the data being sent is in XML format
+        xhr.setRequestHeader("Content-Type", "text/xml");
+
+        // Send the request
+        xhr.send(FD);
+    }
+
+ 
+    
+
+
+
+ </script> 
+
+
+    <H2>Parsing the blog out of the exported xml from squarespace</H2>
+        <p>If you have your SquareSpace xml exported to a cloud you can input the url here</p>
+            <input class="source-url" id="source-url" placeholder="Put your source file here"></input>
+                <button class="convert-button" onclick="getXMLFromURL()" >Retrieve Xml from site</button>
+                    <br>
+  
+    
+    <p>If you have your SquareSpace xml exported and saved in a file on your computer you can put your file path here</p>
+    <input type="file" class="source-file" id="source-file" onchange="getSourceFile(event)"></input>
+        <br>
+
+   
+
+   
+    <br>
+  
+    
