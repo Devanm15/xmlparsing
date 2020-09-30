@@ -14,7 +14,7 @@ http.createServer(function (req, res) {
       res.setHeader("Access-Control-Allow-Origin", "*")
       res.setHeader("Access-Control-Allow-Headers", "content-type");
       res.setHeader("Access-Control-Allow-Methods","PUT, POST, GET, DELETE, PATCH, OPTIONS");
-        fs.appendFile("blog.xml", body,  function (err) {
+        fs.writeFile("blog.xml", body,  function (err) {
           if (err) throw err;
           res.write('File created!');
         })
