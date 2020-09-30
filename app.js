@@ -17,9 +17,10 @@ http.createServer(function (req, res) {
         fs.writeFile("blog.xml", body,  function (err) {
           if (err) throw err;
           res.write('File created!');
+          res.end(body);
         })
       res.writeHead(200);
-      res.end(body);
+      
     })
 }).listen(8080)
 
